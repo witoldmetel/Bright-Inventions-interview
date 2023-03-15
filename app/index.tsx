@@ -4,6 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useState } from 'react'
 import { Text, StyleSheet, TextInput, Button, View, SafeAreaView, FlatList, Pressable } from 'react-native'
+import { CommitsSheet } from './components/CommitsSheet'
 
 import { BASE_URL, repoNamePattern } from './constants'
 import { Commit, RepoData } from './types'
@@ -30,12 +31,13 @@ const Item = ({ item, selectedCommits, handleChange }) => {
 }
 
 export default function RootApp() {
-	const [repo, setRepo] = useState('')
-	const [isRepoNameValid, setIsRepoNameValid] = useState(true)
+	const [repo, setRepo] = useState<string>('')
+	const [isRepoNameValid, setIsRepoNameValid] = useState<boolean>(true)
 	const [repoData, setRepoData] = useState<RepoData | null>(null)
-	const [isLoading, setIsLoading] = useState(false)
-	const [errorMessage, setErrorMessage] = useState('')
+	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [errorMessage, setErrorMessage] = useState<string>('')
 	const [selectedCommits, setSelectedCommits] = React.useState<Commit[]>([])
+	const [isVisible, setIsVisible] = useState<boolean>(false)
 
 	const handleRepoChange = (text: string) => {
 		setRepo(text)
@@ -144,6 +146,8 @@ export default function RootApp() {
 		}
 	}
 
+	const toggleCommitsSheet = () => setIsVisible(!isVisible)
+
 	return (
 		<SafeAreaView style={styles.screenWrapper}>
 			<View style={styles.container}>
@@ -172,11 +176,12 @@ export default function RootApp() {
 									)}
 									contentContainerStyle={{ flexGrow: 1 }}
 								/>
-								<Button title="Send" disabled={!selectedCommits.length} onPress={() => console.log('wow')} />
+								<Button title="Send" disabled={selectedCommits.length === 0} onPress={toggleCommitsSheet} />
 							</View>
 						) : null}
 					</View>
 				) : null}
+				<CommitsSheet isVisible={isVisible} toggleCommitsSheet={toggleCommitsSheet} commitsToSend={selectedCommits} />
 			</View>
 		</SafeAreaView>
 	)
