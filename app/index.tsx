@@ -1,4 +1,4 @@
-/* eslint-disable react-native/no-inline-styles */
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useState } from 'react'
 import { Text, StyleSheet, TextInput, Button, View, SafeAreaView, FlatList } from 'react-native'
 
@@ -21,43 +21,82 @@ export default function RootApp() {
 		}
 	}
 
+	const storeRepoData = async (id, value) => {
+		try {
+			const jsonValue = JSON.stringify(value)
+
+			await AsyncStorage.setItem(id, jsonValue)
+		} catch (e) {
+			console.error(e)
+		}
+	}
+
+	const getRepoData = async (id: string) => {
+		try {
+			const jsonValue = await AsyncStorage.getItem(id)
+
+			return jsonValue !== null ? JSON.parse(jsonValue) : null
+		} catch (e) {
+			console.error(e)
+		}
+	}
+
 	const handleSearchRepo = async () => {
 		if (isRepoNameValid) {
 			setIsLoading(true)
 
-			const response = await fetch(`${BASE_URL}${repo}`).then(response => {
-				if (response.status === 200) {
-					return response.json()
-				}
-			})
+			const cachedData = await getRepoData(repo)
 
-			if (response) {
-				setRepoData({ id: response.id })
-
-				const commitsResponse = await fetch(`${BASE_URL}${repo}/commits`).then(response => {
+			if (cachedData) {
+				setRepoData({ ...cachedData })
+			} else {
+				const response = await fetch(`${BASE_URL}${repo}`).then(response => {
 					if (response.status === 200) {
 						return response.json()
 					}
 				})
 
-				if (commitsResponse) {
-					setRepoData(prevRepoData => ({
-						...prevRepoData,
-						commits: commitsResponse
-							// @todo: update type
-							// eslint-disable-next-line @typescript-eslint/no-explicit-any
-							.map((commit: any) => ({
-								message: commit.commit.message,
-								sha: commit.sha,
-								authorName: commit.commit.author.name,
-							}))
-							.sort((a: Commit, b: Commit) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-					}))
+				if (response) {
+					setRepoData({ id: response.id })
+
+					const commitsResponse = await fetch(`${BASE_URL}${repo}/commits`).then(response => {
+						if (response.status === 200) {
+							return response.json()
+						}
+					})
+
+					if (commitsResponse) {
+						setRepoData(prevRepoData => ({
+							...prevRepoData,
+							commits: commitsResponse
+								// @todo: update type
+								// eslint-disable-next-line @typescript-eslint/no-explicit-any
+								.map((commit: any) => ({
+									message: commit.commit.message,
+									sha: commit.sha,
+									authorName: commit.commit.author.name,
+								}))
+								.sort((a: Commit, b: Commit) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+						}))
+
+						storeRepoData(repo, {
+							id: response.id,
+							commits: commitsResponse
+								// @todo: update type
+								// eslint-disable-next-line @typescript-eslint/no-explicit-any
+								.map((commit: any) => ({
+									message: commit.commit.message,
+									sha: commit.sha,
+									authorName: commit.commit.author.name,
+								}))
+								.sort((a: Commit, b: Commit) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+						})
+					} else {
+						setErrorMessage('Commits not found')
+					}
 				} else {
-					setErrorMessage('Commits not found')
+					setErrorMessage('Repository not found')
 				}
-			} else {
-				setErrorMessage('Repository not found')
 			}
 
 			setIsLoading(false)
@@ -96,6 +135,8 @@ export default function RootApp() {
 											<Text>{item.authorName}</Text>
 										</View>
 									)}
+									// @todo: Update style
+									// eslint-disable-next-line react-native/no-inline-styles
 									contentContainerStyle={{ flexGrow: 1 }}
 								/>
 							</View>
