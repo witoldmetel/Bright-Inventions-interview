@@ -3,6 +3,7 @@ export type Commit = {
 	sha: string
 	authorName: string
 	date: Date
+	isChecked?: boolean
 }
 
 export type RepoData = {
