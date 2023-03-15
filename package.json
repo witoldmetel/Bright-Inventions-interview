@@ -1,0 +1,39 @@
+{
+	"dependencies": {
+		"@react-native-async-storage/async-storage": "^1.17.11",
+		"expo": "^47.0.0",
+		"react": "18.1.0",
+		"react-dom": "18.1.0",
+		"react-native": "0.70.5",
+		"react-native-web": "~0.18.7"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.19.3",
+		"@types/react": "~18.0.24",
+		"@types/react-native": "~0.70.6",
+		"@typescript-eslint/eslint-plugin": "^5.55.0",
+		"@typescript-eslint/parser": "^5.55.0",
+		"eslint": "^8.36.0",
+		"eslint-config-prettier": "^8.7.0",
+		"eslint-plugin-react": "^7.32.2",
+		"eslint-plugin-react-native": "^4.0.0",
+    "lint-staged": "^12.3.7",
+		"husky": "^7.0.1",
+		"prettier": "^2.8.4",
+		"prettier-plugin-sort-json": "^1.0.0",
+		"typescript": "^4.6.3"
+	},
+	"scripts": {
+		"start": "expo start",
+		"android": "expo start --android",
+		"ios": "expo start --ios",
+		"web": "expo start --web",
+		"compile": "tsc --noEmit -p . --pretty",
+		"lint:fix": "prettier --write '**/*.{ts,tsx,js,json}' && eslint --fix . --ext .ts,.tsx && tsc --project ./tsconfig.json --noemit",
+		"lint": "eslint --fix . --ext .ts,.tsx && tsc --project ./tsconfig.json --noemit",
+		"prepare": "husky install"
+	},
+	"version": "1.0.0",
+	"private": true,
+	"name": "interview-gh-viewer"
+}

@@ -1,0 +1,7 @@
+babel.config.js
+metro.config.js
+app/components/icon/icons/icons.d.ts
+plugins/withSimulatorExcludedArchitectures.js
+firebase/**
+test/**
+storybook/**

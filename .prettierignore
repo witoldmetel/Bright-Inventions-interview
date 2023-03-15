@@ -1,0 +1,6 @@
+.vscode
+android
+ios
+node_modules
+package.json
+firebase/functions

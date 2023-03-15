@@ -1,0 +1,9 @@
+{
+	"app/**/*.{ts,tsx,js}": [
+		"yarn run eslint --fix",
+		"yarn run prettier --write"
+	],
+	"app/**/*.json": [
+		"yarn run prettier --write"
+	]
+}
