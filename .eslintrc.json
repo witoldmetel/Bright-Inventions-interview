@@ -9,7 +9,6 @@
 		"plugin:@typescript-eslint/recommended",
 		"plugin:react/recommended",
 		"plugin:react-native/all",
-		"standard",
 		"prettier"
 	],
 	"globals": {
@@ -62,32 +61,9 @@
 		"space-before-function-paren": 0,
 		"no-default-export": 0,
 		"no-duplicate-imports": ["error"],
-		"import/newline-after-import": [
-			"error",
-			{
-				"count": 1
-			}
-		],
 		"camelcase": 0,
-		"import/order": [
-			"error",
-			{
-				"groups": ["builtin", "external", "internal"],
-				"pathGroups": [
-					{
-						"pattern": "react",
-						"group": "external",
-						"position": "before"
-					}
-				],
-				"pathGroupsExcludedImportTypes": ["react"],
-				"alphabetize": {
-					"order": "asc",
-					"caseInsensitive": true
-				}
-			}
-		],
-		"no-color-literals": 0
+		"no-color-literals": "off",
+		"react-native/no-color-literals": "off"
 	},
 	"settings": {
 		"react": {
