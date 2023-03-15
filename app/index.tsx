@@ -1,34 +1,11 @@
-// @todo: Remove this
-/* eslint-disable react-native/no-inline-styles */
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useState } from 'react'
-import { Text, StyleSheet, TextInput, Button, View, SafeAreaView, FlatList, Pressable } from 'react-native'
-import { CommitsSheet } from './components/CommitsSheet'
+import { Text, StyleSheet, TextInput, View, SafeAreaView } from 'react-native'
+import { Button } from './components/Button'
+import { RepositoryWrapper } from './components/RepositoryWrapper'
 
 import { BASE_URL, repoNamePattern } from './constants'
 import { Commit, RepoData } from './types'
-
-const Item = ({ item, selectedCommits, handleChange }) => {
-	const isItemChecked = selectedCommits.find(selectedCommit => selectedCommit.sha === item.sha)
-
-	return (
-		<Pressable onPress={() => handleChange(item.sha)}>
-			<View style={styles.commitItem}>
-				<MaterialCommunityIcons
-					name={isItemChecked ? 'checkbox-marked' : 'checkbox-blank-outline'}
-					size={24}
-					color="#000"
-				/>
-				<Text style={{ color: 'green' }}>{item.authorName}</Text>
-				<Text style={{ color: 'blue' }}>{item.sha}</Text>
-				<Text numberOfLines={2} style={{ color: 'red' }}>
-					{item.message}
-				</Text>
-			</View>
-		</Pressable>
-	)
-}
 
 export default function RootApp() {
 	const [repo, setRepo] = useState<string>('')
@@ -36,8 +13,6 @@ export default function RootApp() {
 	const [repoData, setRepoData] = useState<RepoData | null>(null)
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const [errorMessage, setErrorMessage] = useState<string>('')
-	const [selectedCommits, setSelectedCommits] = React.useState<Commit[]>([])
-	const [isVisible, setIsVisible] = useState<boolean>(false)
 
 	const handleRepoChange = (text: string) => {
 		setRepo(text)
@@ -48,7 +23,7 @@ export default function RootApp() {
 		}
 	}
 
-	const storeRepoData = async (id, value) => {
+	const storeRepoData = async (id: string, value) => {
 		try {
 			const jsonValue = JSON.stringify(value)
 
@@ -122,34 +97,20 @@ export default function RootApp() {
 						setErrorMessage('Commits not found')
 					}
 				} else {
+					setRepoData(null)
 					setErrorMessage('Repository not found')
 				}
 			}
 
 			setIsLoading(false)
 		} else {
+			setRepoData(null)
 			setErrorMessage(`Invalid repository name: ${repo}`)
 		}
 	}
 
-	const selectCommit = (sha: string) => {
-		const isCommitSelected = selectedCommits.find(selectedCommit => selectedCommit.sha === sha)
-
-		if (isCommitSelected) {
-			const filteredArray = selectedCommits.filter(item => item.sha !== sha)
-
-			setSelectedCommits(filteredArray)
-		} else {
-			const commitToSend = repoData.commits.find(commit => sha === commit.sha)
-
-			setSelectedCommits(prev => [...prev, commitToSend])
-		}
-	}
-
-	const toggleCommitsSheet = () => setIsVisible(!isVisible)
-
 	return (
-		<SafeAreaView style={styles.screenWrapper}>
+		<SafeAreaView style={styles.rootContainer}>
 			<View style={styles.container}>
 				<Text style={styles.title}>Github Finder</Text>
 				<Text style={styles.inputLabel}>GitHub repository name</Text>
@@ -161,52 +122,24 @@ export default function RootApp() {
 					onChangeText={handleRepoChange}
 				/>
 				{errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
-				{isLoading ? <Text>Loading...</Text> : <Button title="Search" disabled={!repo} onPress={handleSearchRepo} />}
-				{repoData ? (
-					<View style={styles.repoDataContainer}>
-						<Text>Repository ID: {repoData.id}</Text>
-						{repoData.commits ? (
-							<View>
-								<Text>Latest commits:</Text>
-								<FlatList
-									data={repoData.commits}
-									keyExtractor={item => item.sha}
-									renderItem={({ item }) => (
-										<Item item={item} selectedCommits={selectedCommits} handleChange={selectCommit} />
-									)}
-									contentContainerStyle={{ flexGrow: 1 }}
-								/>
-								<Button title="Send" disabled={selectedCommits.length === 0} onPress={toggleCommitsSheet} />
-							</View>
-						) : null}
-					</View>
-				) : null}
-				<CommitsSheet isVisible={isVisible} toggleCommitsSheet={toggleCommitsSheet} commitsToSend={selectedCommits} />
+				<Button title={isLoading ? 'Loading...' : 'Search'} disabled={!repo} onPress={handleSearchRepo} />
+				<RepositoryWrapper repositoryData={repoData} />
 			</View>
 		</SafeAreaView>
 	)
 }
 
 const styles = StyleSheet.create({
-	commitItem: {
-		borderBottomColor: '#ccc',
-		borderBottomWidth: 2,
-		height: 80,
-		// @todo: temporary fix bottom edge
-		marginBottom: 12,
-		padding: 3,
-	},
 	container: {
 		alignItems: 'center',
 		flex: 1,
 		padding: 16,
 	},
 	errorMessage: {
-		color: 'red',
-		marginTop: 8,
+		color: '#bd2c00',
 	},
 	input: {
-		borderColor: 'gray',
+		borderColor: '#333',
 		borderWidth: 2,
 		height: 40,
 		marginBottom: 16,
@@ -214,17 +147,16 @@ const styles = StyleSheet.create({
 		width: '100%',
 	},
 	inputLabel: {
+		color: '#333',
 		marginBottom: 8,
 		textAlign: 'left',
 		width: '100%',
 	},
-	repoDataContainer: {
-		flex: 1,
-	},
-	screenWrapper: {
+	rootContainer: {
 		flex: 1,
 	},
 	title: {
+		color: '#333',
 		fontSize: 28,
 		marginBottom: 8,
 	},
