@@ -16,18 +16,18 @@ export const CommitsSheet = ({ isVisible, toggleCommitsSheet, commitsToSend }: C
 	const handleSend = (app: string) => {
 		toggleCommitsSheet()
 
-		const message = JSON.stringify(commitsToSend)
+		const commits = JSON.stringify(commitsToSend)
 
 		let url
 		switch (app) {
 			case 'message':
 				url = Platform.select({
-					ios: `sms:&body=${message}`,
-					android: `sms:?body=${message}`,
+					ios: `sms:&body=${commits}`,
+					android: `sms:?body=${commits}`,
 				})
 				break
 			case 'email':
-				url = `mailto::?subject=Commits&body=${message}`
+				url = `mailto::?subject=Commits&body=${commits}`
 				break
 			default:
 				console.error(`Invalid app: ${app}`)
@@ -52,10 +52,10 @@ export const CommitsSheet = ({ isVisible, toggleCommitsSheet, commitsToSend }: C
 					<Text style={styles.title}>Send commits via:</Text>
 					<View style={styles.options}>
 						<Pressable onPress={() => handleSend('message')}>
-							<MaterialIcons name="sms" size={44} color="#000" />
+							<MaterialIcons name="sms" size={44} color="#333" />
 						</Pressable>
 						<Pressable onPress={() => handleSend('email')}>
-							<MaterialIcons name="email" size={44} color="#000" />
+							<MaterialIcons name="email" size={44} color="#333" />
 						</Pressable>
 					</View>
 				</View>
@@ -67,7 +67,7 @@ export const CommitsSheet = ({ isVisible, toggleCommitsSheet, commitsToSend }: C
 const styles = StyleSheet.create({
 	container: {
 		alignItems: 'center',
-		backgroundColor: '#fff',
+		backgroundColor: '#f5f5f5',
 		height: 150,
 		justifyContent: 'center',
 		width: '100%',

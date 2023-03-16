@@ -20,7 +20,7 @@ export const CommitWrapper = ({ item, selectedCommits, handleChange }: CommitWra
 				<MaterialCommunityIcons
 					name={isItemChecked ? 'checkbox-marked' : 'checkbox-blank-outline'}
 					size={24}
-					color="#000"
+					color="#333"
 				/>
 				<View style={styles.commitData}>
 					<Text>{item.authorName}</Text>

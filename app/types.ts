@@ -3,10 +3,17 @@ export type Commit = {
 	sha: string
 	authorName: string
 	date: Date
-	isChecked?: boolean
 }
 
 export type RepoData = {
 	id: number
 	commits?: Commit[]
+}
+
+export type CommitResponse = {
+	commit: {
+		message: string
+		sha: string
+		author: { name: string }
+	}
 }

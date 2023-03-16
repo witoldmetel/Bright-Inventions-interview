@@ -15,17 +15,16 @@ export function RepositoryWrapper({ repositoryData }: RepositoryWrapperProps) {
 	const [isVisible, setIsVisible] = useState<boolean>(false)
 
 	const selectCommit = (sha: string) => {
-		const isCommitSelected = selectedCommits.find(selectedCommit => selectedCommit.sha === sha)
+		const commitToSend = repositoryData.commits.find(commit => sha === commit.sha)
+		const isCommitSelected = selectedCommits.some(selectedCommit => selectedCommit.sha === sha)
 
-		if (isCommitSelected) {
-			const filteredArray = selectedCommits.filter(item => item.sha !== sha)
-
-			setSelectedCommits(filteredArray)
-		} else {
-			const commitToSend = repositoryData.commits.find(commit => sha === commit.sha)
-
-			setSelectedCommits(prev => [...prev, commitToSend])
-		}
+		setSelectedCommits(prevCommits => {
+			if (isCommitSelected) {
+				return prevCommits.filter(item => item.sha !== sha)
+			} else {
+				return [...prevCommits, commitToSend]
+			}
+		})
 	}
 
 	const toggleCommitsSheet = () => setIsVisible(!isVisible)

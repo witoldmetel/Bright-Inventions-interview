@@ -1,11 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useState } from 'react'
 import { Text, StyleSheet, TextInput, View, SafeAreaView } from 'react-native'
 import { Button } from './components/Button'
 import { RepositoryWrapper } from './components/RepositoryWrapper'
 
 import { BASE_URL, repoNamePattern } from './constants'
-import { Commit, RepoData } from './types'
+import { Commit, CommitResponse, RepoData } from './types'
+import { getRepoData, storeRepoData } from './utils/storage'
 
 export default function RootApp() {
 	const [repo, setRepo] = useState<string>('')
@@ -23,90 +23,73 @@ export default function RootApp() {
 		}
 	}
 
-	const storeRepoData = async (id: string, value) => {
-		try {
-			const jsonValue = JSON.stringify(value)
-
-			await AsyncStorage.setItem(id, jsonValue)
-		} catch (e) {
-			console.error(e)
-		}
-	}
-
-	const getRepoData = async (id: string) => {
-		try {
-			const jsonValue = await AsyncStorage.getItem(id)
-
-			return jsonValue !== null ? JSON.parse(jsonValue) : null
-		} catch (e) {
-			console.error(e)
-		}
-	}
-
 	const handleSearchRepo = async () => {
-		if (isRepoNameValid) {
-			setIsLoading(true)
-
-			const cachedData = await getRepoData(repo)
-
-			if (cachedData) {
-				setRepoData({ ...cachedData })
-			} else {
-				const response = await fetch(`${BASE_URL}${repo}`).then(response => {
-					if (response.status === 200) {
-						return response.json()
-					}
-				})
-
-				if (response) {
-					setRepoData({ id: response.id })
-
-					const commitsResponse = await fetch(`${BASE_URL}${repo}/commits`).then(response => {
-						if (response.status === 200) {
-							return response.json()
-						}
-					})
-
-					if (commitsResponse) {
-						setRepoData(prevRepoData => ({
-							...prevRepoData,
-							commits: commitsResponse
-								// @todo: update type
-								// eslint-disable-next-line @typescript-eslint/no-explicit-any
-								.map((commit: any) => ({
-									message: commit.commit.message,
-									sha: commit.sha,
-									authorName: commit.commit.author.name,
-								}))
-								.sort((a: Commit, b: Commit) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-						}))
-
-						storeRepoData(repo, {
-							id: response.id,
-							commits: commitsResponse
-								// @todo: update type
-								// eslint-disable-next-line @typescript-eslint/no-explicit-any
-								.map((commit: any) => ({
-									message: commit.commit.message,
-									sha: commit.sha,
-									authorName: commit.commit.author.name,
-								}))
-								.sort((a: Commit, b: Commit) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-						})
-					} else {
-						setErrorMessage('Commits not found')
-					}
-				} else {
-					setRepoData(null)
-					setErrorMessage('Repository not found')
-				}
-			}
-
-			setIsLoading(false)
-		} else {
+		if (!isRepoNameValid) {
 			setRepoData(null)
 			setErrorMessage(`Invalid repository name: ${repo}`)
+
+			return
 		}
+
+		setIsLoading(true)
+
+		const cachedData = await getRepoData(repo)
+
+		if (cachedData) {
+			setRepoData({ ...cachedData })
+			setIsLoading(false)
+
+			return
+		}
+
+		const response = await fetch(`${BASE_URL}${repo}`).then(response => {
+			if (response.status === 200) {
+				return response.json()
+			}
+		})
+
+		if (!response) {
+			setRepoData(null)
+			setErrorMessage('Repository not found')
+			setIsLoading(false)
+
+			return
+		}
+
+		const commitsResponse = await fetch(`${BASE_URL}${repo}/commits`).then(response => {
+			if (response.status === 200) {
+				return response.json()
+			}
+		})
+		console.log('file: index.tsx:63 ~ commitsResponse ~ commitsResponse:', commitsResponse)
+
+		if (!commitsResponse) {
+			setRepoData(null)
+			setErrorMessage('Commits not found')
+			setIsLoading(false)
+
+			return
+		}
+
+		const formattedCommits = commitsResponse
+			.map(({ commit }: CommitResponse) => ({
+				message: commit.message,
+				sha: commit.sha,
+				authorName: commit.author.name,
+			}))
+			.sort((a: Commit, b: Commit) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+		setRepoData({
+			id: response.id,
+			commits: formattedCommits,
+		})
+
+		storeRepoData(repo, {
+			id: response.id,
+			commits: formattedCommits,
+		})
+
+		setIsLoading(false)
 	}
 
 	return (
