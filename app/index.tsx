@@ -33,8 +33,10 @@ export default function RootApp() {
 
 		setIsLoading(true)
 
+		// check if repository data is cached in AsyncStorage
 		const cachedData = await getRepoData(repo)
 
+		// if repository data is cached, set repoData to cached data
 		if (cachedData) {
 			setRepoData({ ...cachedData })
 			setIsLoading(false)
@@ -61,7 +63,6 @@ export default function RootApp() {
 				return response.json()
 			}
 		})
-		console.log('file: index.tsx:63 ~ commitsResponse ~ commitsResponse:', commitsResponse)
 
 		if (!commitsResponse) {
 			setRepoData(null)

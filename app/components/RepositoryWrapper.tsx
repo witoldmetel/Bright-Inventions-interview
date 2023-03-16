@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Text, StyleSheet, View, FlatList } from 'react-native'
 
 import { Commit, RepoData } from '../types'
@@ -13,6 +13,10 @@ type RepositoryWrapperProps = {
 export function RepositoryWrapper({ repositoryData }: RepositoryWrapperProps) {
 	const [selectedCommits, setSelectedCommits] = useState<Commit[]>([])
 	const [isVisible, setIsVisible] = useState<boolean>(false)
+
+	useEffect(() => {
+		setSelectedCommits([])
+	}, [repositoryData])
 
 	const selectCommit = (sha: string) => {
 		const commitToSend = repositoryData.commits.find(commit => sha === commit.sha)
