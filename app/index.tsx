@@ -73,9 +73,9 @@ export default function RootApp() {
 		}
 
 		const formattedCommits = commitsResponse
-			.map(({ commit }: CommitResponse) => ({
+			.map(({ sha, commit }: CommitResponse) => ({
 				message: commit.message,
-				sha: commit.sha,
+				sha: sha,
 				authorName: commit.author.name,
 			}))
 			.sort((a: Commit, b: Commit) => new Date(b.date).getTime() - new Date(a.date).getTime())

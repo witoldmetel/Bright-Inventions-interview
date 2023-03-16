@@ -11,9 +11,9 @@ export type RepoData = {
 }
 
 export type CommitResponse = {
+	sha: string
 	commit: {
 		message: string
-		sha: string
 		author: { name: string }
 	}
 }
