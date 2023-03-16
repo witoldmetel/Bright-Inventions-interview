@@ -1,7 +1,5 @@
 # Github Finder
 
-![Simulator Screen Shot - iPhone 14 - 2023-03-16 at 16 38 45](https://user-images.githubusercontent.com/31034370/225723313-3b1451f7-e62b-449c-8da1-0ed9bf47a835.png)
-
 ## Description
 
 Write a React Native application with the following features:
@@ -97,3 +95,8 @@ App was tested on real devices using Expo Go.
 ## Known Issues
 
 1. Commits sends via Messanger and Signal are cutted
+
+## Example screen
+
+![Simulator Screen Shot - iPhone 14 - 2023-03-16 at 16 38 45](https://user-images.githubusercontent.com/31034370/225723313-3b1451f7-e62b-449c-8da1-0ed9bf47a835.png)
+
